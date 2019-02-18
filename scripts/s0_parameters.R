@@ -21,27 +21,28 @@ packages <- function(x){
 
 ### Install (if necessary) two missing packages in your local SEPAL environment
 packages(Hmisc)
-packages(RCurl)
-packages(hexbin)
-packages(devtools)
-packages(gdata)
-install_github('yfinegold/gfcanalysis')
-packages(gfcanalysis)
-packages(tidyverse)
-packages(readxl)
+# packages(RCurl)
+# packages(hexbin)
+# packages(devtools)
+# packages(gdata)
+# install_github('yfinegold/gfcanalysis')
+# packages(gfcanalysis)
+# packages(tidyverse)
+# packages(readxl)
+# packages(ggplot2)
 
 ### Load necessary packages
 packages(raster)
 packages(rgeos)
-packages(ggplot2)
 packages(rgdal)
-packages(stringr)
+# packages(stringr)
+
 
 ## Set the working directory
 rootdir       <- "~/prims/"
 
 ## Set two downloads directories
-gfcstore_dir  <- "~/downloads/gfc_2016/"
+gfcstore_dir  <- "~/downloads/gfc_2017/"
 
 
 ## Set the country code
