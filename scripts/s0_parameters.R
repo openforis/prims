@@ -5,7 +5,6 @@
 ## 2018/05/04
 ####################################################################################################
 ####################################################################################################
-
 ####################################################################################################
 
 ### Read all external files with TEXT as TEXT
@@ -24,52 +23,56 @@ packages <- function(x){
 packages(Hmisc)
 packages(RCurl)
 packages(hexbin)
+packages(devtools)
+packages(gdata)
+install_github('yfinegold/gfcanalysis')
 packages(gfcanalysis)
+packages(tidyverse)
+packages(readxl)
 
 ### Load necessary packages
 packages(raster)
 packages(rgeos)
 packages(ggplot2)
 packages(rgdal)
-packages(dplyr)
+packages(stringr)
 
 ## Set the working directory
-rootdir       <- "~/ws_uga_20180828/"
+rootdir       <- "~/prims/"
 
 ## Set two downloads directories
 gfcstore_dir  <- "~/downloads/gfc_2016/"
-esastore_dir  <- "~/downloads/ESA_2016/"
+
 
 ## Set the country code
-countrycode <- "UGA"
+countrycode <- "IDN"
 
 ## Go to the root directory
 setwd(rootdir)
 rootdir <- paste0(getwd(),"/")
 
-scriptdir<- paste0(rootdir,"scripts/")
-data_dir <- paste0(rootdir,"data/")
-gadm_dir <- paste0(rootdir,"data/gadm/")
-gfc_dir  <- paste0(rootdir,"data/gfc/")
-lsat_dir <- paste0(rootdir,"data/mosaic_lsat/")
-seg_dir  <- paste0(rootdir,"data/segments/")
-dd_dir   <- paste0(rootdir,"data/dd_map/")
-lc_dir   <- paste0(rootdir,"data/forest_mask/")
-esa_dir  <- paste0(rootdir,"data/esa/")
-tile_dir <- paste0(rootdir,"data/tiling/")
-tab_dir  <- paste0(rootdir,"data/tables/")
+scriptdir <- paste0(rootdir,"scripts/")
+data_dir  <- paste0(rootdir,"data/")
+gadm_dir  <- paste0(rootdir,"data/gadm/")
+gfc_dir   <- paste0(rootdir,"data/gfc/")
+moz_dir   <- paste0(rootdir,"data/mosaic/")
+seg_dir   <- paste0(rootdir,"data/segments/")
+dd_dir    <- paste0(rootdir,"data/dd_map/")
+tile_dir  <- paste0(rootdir,"data/tiling/")
+tab_dir   <- paste0(rootdir,"data/tables/")
+aoi_dir   <- paste0(rootdir,"data/aoi/")
+gwl_dir   <- paste0(rootdir,"data/data_gwl/")
+dam_dir   <- paste0(rootdir,"data/data_canals/3.AREA_RENCANA_KONTIJENSI_2017/")
 
 dir.create(data_dir,showWarnings = F)
 dir.create(gadm_dir,showWarnings = F)
 dir.create(gfc_dir,showWarnings = F)
-dir.create(lsat_dir,showWarnings = F)
+dir.create(moz_dir,showWarnings = F)
 dir.create(seg_dir,showWarnings = F)
 dir.create(dd_dir,showWarnings = F)
-dir.create(lc_dir,showWarnings = F)
-dir.create(esa_dir,showWarnings = F)
 dir.create(gfcstore_dir,showWarnings = F)
-dir.create(esastore_dir,showWarnings = F)
 dir.create(tile_dir,showWarnings = F)
+dir.create(gwl_dir,showWarnings = F)
 
 #################### GFC PRODUCTS
 gfc_threshold <- 30
