@@ -83,7 +83,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = paste0('Downloading data in ', dirname("~/prims_data_test/")),
                  value = 0,
                  {
-                   system("wget -O ~/prims_data_test/prims_example.csv  https://github.com/openforis/data_test/raw/master/prims_example.csv")
+                   system("wget -O ~/prims_data_test/prims_gwl_example.csv  https://github.com/openforis/data_test/raw/master/prims_example.csv")
                    
                  })
     
