@@ -113,7 +113,7 @@ shinyServer(function(input, output, session) {
   
   ################################# Display the file path
   output$filepath <- renderPrint({
-    #validate(need(input$input_file, "Missing input: Please select the file"))
+    validate(need(input$input_file, ""))
     
     df <- parseFilePaths(volumes, input$input_file)
     file_path <- as.character(df[, "datapath"])
@@ -164,8 +164,8 @@ shinyServer(function(input, output, session) {
   
   
   ##################################################################################################################################
-  ############### Run 
-  prims_res <- eventReactive(input$StartButton,
+  ############### READ THE DATA
+  prims_data <- eventReactive(input$StartButton,
                              {
                                req(input$input_file)
                                req(input$StartButton)
@@ -178,33 +178,222 @@ shinyServer(function(input, output, session) {
                                
                              })
   
+  ##################################################################################################################################
+  ############### DAILY PRECIPITATIONS
+  daily_sum_precip <- eventReactive(input$StartButton,
+                                   {
+                                     req(input$input_file)
+                                     req(input$StartButton)
+                                     req(prims_data())
+                                     
+                                     data <- prims_data()
+                                     
+                                     data %>%
+                                       mutate(day = as.Date(WAKTU, format = "%m/%d/%Y %H:%M")) %>%
+                                       group_by(day) %>% # group by the day column
+                                       summarise(total_precip=sum(RAIN)) %>%  # calculate the SUM of all precipitation that occurred on each day
+                                       na.omit()
+                                   })
   
+  ##################################################################################################################################
+  ############### DAILY GWL                                 
+  daily_avg_gwl <- eventReactive(input$StartButton,
+                                 {
+                                   req(input$input_file)
+                                   req(input$StartButton)
+                                   req(prims_data())
+                                   
+                                   data <- prims_data()
+                                   
+                                   data %>%
+                                     mutate(day = as.Date(WAKTU, format = "%m/%d/%Y %H:%M")) %>%
+                                     group_by(day) %>% # group by the day column
+                                     summarise(avg_gwl=mean(GWL)) %>%  # calculate the AVERAGE of GWL
+                                     na.omit()
+                                 })
+  
+  ##################################################################################################################################
+  ############### DAILY SOIL MOISTURE
+  
+  daily_avg_sm <- eventReactive(input$StartButton,
+                                {
+                                  req(input$input_file)
+                                  req(input$StartButton)
+                                  req(prims_data())
+                                  
+                                  data <- prims_data()
+                                  
+                                  data %>%
+                                    mutate(day = as.Date(WAKTU, format = "%m/%d/%Y %H:%M")) %>%
+                                    group_by(day) %>% # group by the day column
+                                    summarise(avg_sm=mean(SOILMOISTURE)) %>%  # calculate the AVERAGE OF SOILMOISTURE
+                                    na.omit()
+                                })
+  
+  ##################################################################################################################################
+  ############### WEEKLY PRECIPITATIONS
+  weekly_sum_precip <- eventReactive(input$StartButton,
+                                    {
+                                      req(input$input_file)
+                                      req(input$StartButton)
+                                      req(prims_data())
+                                      
+                                      data <- prims_data()
+                                      
+                                      data %>%
+                                        mutate(week = format(as.Date(WAKTU, format = "%m/%d/%Y %H:%M"),"%W")) %>%
+                                        group_by(week) %>% # group by the day column
+                                        summarise(total_precip=sum(RAIN)) %>%  # calculate the SUM of all precipitation that occurred on each day
+                                        na.omit()
+                                    })
+  
+  ##################################################################################################################################
+  ############### DAILY GWL                                 
+  weekly_avg_gwl <- eventReactive(input$StartButton,
+                                 {
+                                   req(input$input_file)
+                                   req(input$StartButton)
+                                   req(prims_data())
+                                   
+                                   data <- prims_data()
+                                   
+                                   data %>%
+                                     mutate(week = format(as.Date(WAKTU, format = "%m/%d/%Y %H:%M"),"%W")) %>%
+                                     group_by(week) %>% # group by the day column
+                                     summarise(avg_gwl=mean(GWL)) %>%  # calculate the AVERAGE of GWL
+                                     na.omit()
+                                 })
+  
+  ##################################################################################################################################
+  ############### DAILY SOIL MOISTURE
+  
+  weekly_avg_sm <- eventReactive(input$StartButton,
+                                {
+                                  req(input$input_file)
+                                  req(input$StartButton)
+                                  req(prims_data())
+                                  
+                                  data <- prims_data()
+                                  
+                                  data %>%
+                                    mutate(week = format(as.Date(WAKTU, format = "%m/%d/%Y %H:%M"),"%W")) %>%
+                                    group_by(week) %>% # group by the day column
+                                    summarise(avg_sm=mean(SOILMOISTURE)) %>%  # calculate the AVERAGE OF SOILMOISTURE
+                                    na.omit()
+                                })
+  
+  ##################################################################################################################################
+  ############### MONTHLY PRECIPITATIONS
+  monthly_sum_precip <- eventReactive(input$StartButton,
+                                    {
+                                      req(input$input_file)
+                                      req(input$StartButton)
+                                      req(prims_data())
+                                      
+                                      data <- prims_data()
+                                      
+                                      data %>%
+                                        mutate(month = month(as.Date(WAKTU, format = "%m/%d/%Y %H:%M"))) %>%
+                                        group_by(month) %>% # group by the day column
+                                        summarise(total_precip=sum(RAIN)) %>%  # calculate the SUM of all precipitation that occurred on each day
+                                        na.omit()
+                                    })
+  
+  ##################################################################################################################################
+  ############### MONTHLY GWL                                 
+  monthly_avg_gwl <- eventReactive(input$StartButton,
+                                 {
+                                   req(input$input_file)
+                                   req(input$StartButton)
+                                   req(prims_data())
+                                   
+                                   data <- prims_data()
+                                   
+                                   data %>%
+                                     mutate(month = month(as.Date(WAKTU, format = "%m/%d/%Y %H:%M"))) %>%
+                                     group_by(month) %>% # group by the day column
+                                     summarise(avg_gwl=mean(GWL)) %>%  # calculate the AVERAGE of GWL
+                                     na.omit()
+                                 })
+  
+  ##################################################################################################################################
+  ############### MONTHLY SOIL MOISTURE
+  
+  monthly_avg_sm <- eventReactive(input$StartButton,
+                                {
+                                  req(input$input_file)
+                                  req(input$StartButton)
+                                  req(prims_data())
+                                  
+                                  data <- prims_data()
+                                  
+                                  data %>%
+                                    mutate(month = month(as.Date(WAKTU, format = "%m/%d/%Y %H:%M"))) %>%
+                                    group_by(month) %>% # group by the day column
+                                    summarise(avg_sm=mean(SOILMOISTURE)) %>%  # calculate the AVERAGE OF SOILMOISTURE
+                                    na.omit()
+                                })
   
   ############### Display the results as map
   output$display_res <- renderPlot({
-    req(prims_res())
+    req(input$input_file)
+    req(input$StartButton)
+    req(prims_data())
+    
     print('Check: Display the map')
     
-    data <- prims_res()
+    data <- prims_data()
     
-    rate  <- 10
-    my_frequency <- 365*24*60/rate
+    daily_avg_gwl    <- daily_avg_gwl()
+    daily_avg_sm     <- daily_avg_sm()
+    daily_sum_precip <- daily_sum_precip() 
     
-    print(rate)
+    weekly_avg_gwl    <- weekly_avg_gwl()
+    weekly_avg_sm     <- weekly_avg_sm()
+    weekly_sum_precip <- weekly_sum_precip() 
     
-    gwlts  <- ts(data$GWL, frequency=my_frequency,start=c(2017,10))
-    smts   <- ts(data$SOILMOISTURE, frequency=my_frequency, start=c(2017,10))
-    raints <- ts(data$RAIN, frequency=my_frequency, start=c(2017,10))
+    monthly_avg_gwl    <- monthly_avg_gwl()
+    monthly_avg_sm     <- monthly_avg_sm()
+    monthly_sum_precip <- monthly_sum_precip() 
     
+    if(input$option_frequency == "10 minutes"){
+      
+      gwlts  <- ts(data$GWL, frequency=52650,start=c(2017,10))
+      smts   <- ts(data$SOILMOISTURE, frequency=52650, start=c(2017,10))
+      raints <- ts(data$RAIN, frequency=52650, start=c(2017,10))
+      }
+    if(input$option_frequency == "Daily"){
+      
+      gwlts  <- ts(daily_avg_gwl$avg_gwl, frequency=365, start=c(2017,1))
+      smts   <- ts(daily_avg_sm$avg_sm, frequency=365, start=c(2017,1))
+      raints <- ts(daily_sum_precip$total_precip, frequency=365, start=c(2017,1))
+    }
+    if(input$option_frequency == "Weekly"){
+      
+      gwlts  <- ts(weekly_avg_gwl$avg_gwl, frequency=52, start=c(2017,1))
+      smts   <- ts(weekly_avg_sm$avg_sm, frequency=52, start=c(2017,1))
+      raints <- ts(weekly_sum_precip$total_precip, frequency=52, start=c(2017,1))
+    }
+    if(input$option_frequency == "Monthly"){
+      
+      gwlts  <- ts(monthly_avg_gwl$avg_gwl, frequency=12, start=c(2017,1))
+      smts   <- ts(monthly_avg_sm$avg_sm, frequency=12, start=c(2017,1))
+      raints <- ts(monthly_sum_precip$total_precip, frequency=12, start=c(2017,1))
+      }
+
     graph_type <- input$option_graph_type
     
     if(graph_type == "Color overlap"){
-      ts.plot((raints*10), (gwlts*100), smts, gpars = list(col = c("grey", "red", "blue"), ylim=c(-200,200)))}
-    else{
-      if(graph_type == "BW separated"){
-        plot(cbind(raints, gwlts), yax.flip = TRUE)
+      
+      ts.plot((raints*max(smts)/max(raints)), (gwlts*max(smts)/max(gwlts)/20), smts, gpars = list(col = c("grey", "red", "blue"), ylim=c(-max(smts),max(smts))))
       }
-    }
+    if(graph_type == "BW separated"){
+      plot(cbind(raints, gwlts), yax.flip = TRUE)
+      }
+    if(graph_type == "Cross-correlation"){
+      ccf(raints, gwlts, ylab = "Cross-correlation")
+      }
+    
     
   })
   
@@ -218,9 +407,9 @@ shinyServer(function(input, output, session) {
   ##################################################################################################################################
   ############### Display time
   output$message <- renderTable({
-    req(prims_res())
+    req(prims_data())
     
-    data <- prims_res()
+    data <- prims_data()
     
     head(data)
   })

@@ -57,6 +57,11 @@ output$title_ts_dir  <- reactive({
 output$title_opt_dir  <- reactive({
   HTML(paste0("Pilihan")
   )})
+
+output$label_option_aggregation <- reactive({"Jenis agregasi"})
+output$label_option_graph_type <- reactive({"Jenis grafis"})
+
+
 ############################ INTRODUCTION TAB - BOX 5
 output$title_result <- reactive({"Hasil"})
 

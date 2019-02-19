@@ -19,7 +19,6 @@ output$download_testdata_button <- reactive({"Download test dataset"})
 output$select_file_button       <- reactive({"Field measurement file"})
 output$start_button             <- reactive({"Display time series"})
 
-
 #################################################################################### 
 ############################ INTRODUCTION TAB
 #################################################################################### 
@@ -50,6 +49,9 @@ output$title_ts_dir  <- reactive({
 output$title_opt_dir  <- reactive({
   HTML(paste0("Options")
   )})
+
+output$label_option_aggregation <- reactive({"Type of aggregation"})
+output$label_option_graph_type <- reactive({"Graph type"})
 
 ############################ INTRODUCTION TAB - BOX 5
 output$title_result <- reactive({"Results"})

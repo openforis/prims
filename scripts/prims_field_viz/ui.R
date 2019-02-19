@@ -122,19 +122,19 @@ shinyUI(
                       htmlOutput('body_opt_dir'),
                       
                       selectInput(inputId = 'option_graph_type',
-                                  label = "Graph type",
-                                  choices = c("Color overlap","BW separated"),
+                                  label = textOutput('label_option_graph_type'),
+                                  choices = c("Color overlap","BW separated","Cross-correlation"),
                                   multiple = FALSE,
                                   selected = "Color overlap"
                       )
                       
-                      # ,
-                      # selectInput(inputId = 'option_frequency',
-                      #             label = "Data frequency",
-                      #             choices = setNames(c(24*30*60,24*60,60,10),c("Month","Day","Hour","10m")),
-                      #             multiple = FALSE,
-                      #             selected = 10
-                      # )
+                      ,
+                      selectInput(inputId = 'option_frequency',
+                                  label = textOutput('label_option_aggregation'),
+                                  choices = c("Monthly","Weekly","Daily","10 minutes"),
+                                  multiple = FALSE,
+                                  selected = "10 minutes"
+                      )
                       
                       # ,
                       # selectInput(inputId = 'option_Transition',
