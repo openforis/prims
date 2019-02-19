@@ -84,9 +84,10 @@ sqr_df_selected@data$tileID <- row(sqr_df_selected@data)[,1]
 ### Export ONE TILE as KML
 export_name <- paste0("one_tile_",countrycode)
 one_tile <- sqr_df_selected[sqr_df_selected$tileID == 10,]
+plot(one_tile,add=T,col="blue")
 
 writeOGR(obj=   one_tile,
-         dsn=   paste(tile_dir,base_sqr,".kml",sep=""),
+         dsn=   paste(tile_dir,export_name,".kml",sep=""),
          layer= export_name,
          driver = "KML",
          overwrite_layer = T)
@@ -96,7 +97,7 @@ writeOGR(obj=   one_tile,
 export_name <- paste0("tiling_system_",countrycode)
 
 writeOGR(obj=sqr_df_selected,
-         dsn=paste(tile_dir,base_sqr,".kml",sep=""),
+         dsn=paste(tile_dir,export_name,".kml",sep=""),
          layer= export_name,
          driver = "KML",
          overwrite_layer = T)
