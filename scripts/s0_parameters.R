@@ -21,6 +21,7 @@ packages <- function(x){
 
 ### Install (if necessary) two missing packages in your local SEPAL environment
 packages(Hmisc)
+packages(lubridate)
 # packages(RCurl)
 # packages(hexbin)
 # packages(devtools)
