@@ -18,6 +18,7 @@ packages <- function(x){
 packages(shiny)
 packages(shinydashboard)
 packages(shinyFiles)
+packages(lubridate)
 # packages(snow)
 # packages(htmltools)
 # packages(devtools)
