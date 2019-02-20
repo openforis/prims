@@ -42,18 +42,19 @@ packages(rgdal)
 ## Set the working directory
 rootdir       <- "~/prims/"
 
-## Set two downloads directories
+## Set download directory
 gfcstore_dir  <- "~/downloads/gfc_2017/"
-
 
 ## Set the country code
 countrycode <- "IDN"
 
 ## Go to the root directory
 setwd(rootdir)
-rootdir <- paste0(getwd(),"/")
+rootdir  <- paste0(getwd(),"/")
+username <- unlist(strsplit(rootdir,"/"))[3]
 
 scriptdir <- paste0(rootdir,"scripts/")
+doc_dir   <- paste0(rootdir,"docs/")
 data_dir  <- paste0(rootdir,"data/")
 gadm_dir  <- paste0(rootdir,"data/gadm/")
 gfc_dir   <- paste0(rootdir,"data/gfc/")

@@ -77,9 +77,13 @@ plot(aoi,add=T,border="blue")
 plot(country,add=T,border="green")
 
 ### Give the output a decent name, with unique ID
+names(sqr_df_selected@data) <- "tileID" 
 sqr_df_selected@data$tileID <- row(sqr_df_selected@data)[,1]
 
-
+### Assign tile number 
+df <- read.csv(paste0(doc_dir,"participants_workshop_20190219.csv"))
+df$tile1 <- 1:nrow(df)
+df$tile2 <- nrow(df)+(1:nrow(df))
 
 ### Export ONE TILE as KML
 export_name <- paste0("one_tile_",countrycode)
@@ -92,8 +96,18 @@ writeOGR(obj=   one_tile,
          driver = "KML",
          overwrite_layer = T)
 
+### Export TWO TILES as KML
+export_name <- paste0("my_two_tiles_",countrycode)
+two_tile    <- sqr_df_selected[sqr_df_selected$tileID %in% df[df$UserName == username,c("tile1","tile2")],]
+plot(two_tile,add=T,col="blue")
 
-### Export as KML
+writeOGR(obj=   two_tile,
+         dsn=   paste(tile_dir,export_name,".kml",sep=""),
+         layer= export_name,
+         driver = "KML",
+         overwrite_layer = T)
+
+### Export ALL TILES as KML
 export_name <- paste0("tiling_system_",countrycode)
 
 writeOGR(obj=sqr_df_selected,
