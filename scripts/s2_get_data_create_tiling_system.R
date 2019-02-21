@@ -87,7 +87,10 @@ df$tile2 <- nrow(df)+(1:nrow(df))
 
 ### Export ONE TILE as KML
 export_name <- paste0("one_tile_",countrycode)
-one_tile <- sqr_df_selected[sqr_df_selected$tileID == 10,]
+#one_tile <- sqr_df_selected[sqr_df_selected$tileID == 10,]
+one_tile <- sqr_df_selected[sample(1:nrow(sqr_df_selected@data),1),]
+
+
 plot(one_tile,add=T,col="blue")
 
 writeOGR(obj=   one_tile,
