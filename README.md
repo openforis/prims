@@ -7,6 +7,12 @@ https://goo.gl/forms/NGxQfSQzqwmuKG8r2
 
 The output of the modules feed in the PRIMS platform
 
+Questions ? Ask us!
+
+erik.lindquist@fao.org
+
+remi.dannunzio@fao.org
+
 ### Indonesia workshop 19-22 February 2019
 The material in this repository was developed during a technical workshop held in Bogor, Indonesia
 
