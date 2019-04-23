@@ -200,7 +200,7 @@ shinyServer(function(input, output, session) {
                                
                                #file_path   <- file_path()
                                
-                               offset        <- read.csv(paste0("~/prims/data/data_gwl/offset_sesame_20190423.csv"))
+                               offset        <- read.csv(paste0("www/offset_sesame_20190423.csv"))
                                offset$offset <- gsub(",",".",offset$offset)
                                
                                folder  <- paste0(folder(),"/")
