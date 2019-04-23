@@ -20,6 +20,7 @@
 ####################################################################################
 
 
+
 ####################################################################################
 ####### Start Server
 
@@ -83,7 +84,9 @@ shinyServer(function(input, output, session) {
     withProgress(message = paste0('Downloading data in ', dirname("~/prims_data_test/")),
                  value = 0,
                  {
-                   system("wget -O ~/prims_data_test/prims_gwl_example.csv  https://github.com/openforis/data_test/raw/master/prims_example.csv")
+                   system("wget -O ~/prims_data_test/brg12.zip  https://github.com/openforis/data_test/raw/master/brg12.zip")
+                   system("unzip -o ~/prims_data_test/brg12.zip  -d ~/prims_data_test/brg12 ")
+                   system("rm ~/prims_data_test/brg12.zip")
                    
                  })
     
@@ -91,51 +94,76 @@ shinyServer(function(input, output, session) {
   })
   
   
+  # ##################################################################################################################################
+  # ############### Select Forest-Non Forest mask
+  # shinyFileChoose(
+  #   input,
+  #   'input_file',
+  #   filetype = "csv",
+  #   roots = volumes,
+  #   session = session,
+  #   restrictions = system.file(package = 'base')
+  # )
+  # 
+  # ################################# File path
+  # file_path <- reactive({
+  #   #validate(need(input$input_file, "Missing input: Please select the file"))
+  #   req(input$input_file)
+  #   df <- parseFilePaths(volumes, input$input_file)
+  #   file_path <- as.character(df[, "datapath"])
+  #   
+  # })
+
   ##################################################################################################################################
   ############### Select Forest-Non Forest mask
-  shinyFileChoose(
+  shinyDirChoose(
     input,
-    'input_file',
-    filetype = "csv",
+    'input_folder',
     roots = volumes,
     session = session,
     restrictions = system.file(package = 'base')
   )
-  
+
   ################################# File path
-  file_path <- reactive({
-    #validate(need(input$input_file, "Missing input: Please select the file"))
-    req(input$input_file)
-    df <- parseFilePaths(volumes, input$input_file)
-    file_path <- as.character(df[, "datapath"])
-    
+  folder <- reactive({
+    validate(need(input$input_folder, "Missing input: Please select the file"))
+    req(input$input_folder)
+    df <- parseDirPath(volumes, input$input_folder)
+    # file_path <- as.character(df[, "datapath"])
+
+  })
+  
+  ################################# Display tiles inside the DATA_DIR
+  output$outdirpath <- renderPrint({
+    req(input$input_folder)
+    basename(folder())
   })
   
   ################################# Display the file path
-  output$filepath <- renderPrint({
-    validate(need(input$input_file, ""))
-    
-    df <- parseFilePaths(volumes, input$input_file)
-    file_path <- as.character(df[, "datapath"])
-    nofile <- as.character("No file selected")
-    if (is.null(file_path)) {
-      cat(nofile)
-    } else{
-      cat(file_path)
-    }
-  })
+  # output$filepath <- renderPrint({
+  #   validate(need(input$input_folder, ""))
+  #   
+  #   df <- parseFilePaths(volumes, input$input_folder)
+  #   file_path <- as.character(df[, "datapath"])
+  #   nofile <- as.character("No file selected")
+  #   if (is.null(file_path)) {
+  #     cat(nofile)
+  #   } else{
+  #     cat(file_path)
+  #   }
+  # })
   
-  ################################# File directory
-  data_dir <- reactive({
-    req(input$input_file)
-    file_path <- file_path()
-    paste0(dirname(file_path),"/")
-  })
+  # ################################# File directory
+  # data_dir <- reactive({
+  #   req(input$input_folder)
+  #   file_path <- file_path()
+  #   paste0(dirname(file_path),"/")
+  # })
   
   ##################################################################################################################################
   ############### Parameters title as a reactive
   parameters <- reactive({
-    req(input$input_file)
+    req(input$input_folder)
     
     # mspa1 <- as.numeric(input$option_FGconn)
     # mspa2 <- as.numeric(input$option_EdgeWidth)
@@ -167,13 +195,50 @@ shinyServer(function(input, output, session) {
   ############### READ THE DATA
   prims_data <- eventReactive(input$StartButton,
                              {
-                               req(input$input_file)
+                               req(input$input_folder)
                                req(input$StartButton)
                                
-                               file_path   <- file_path()
+                               #file_path   <- file_path()
                                
-                               data <- read.csv(file_path)
+                               offset        <- read.csv(paste0("~/prims/data/data_gwl/offset_sesame_20190423.csv"))
+                               offset$offset <- gsub(",",".",offset$offset)
                                
+                               folder  <- paste0(folder(),"/")
+                               files   <- list.files(folder)
+                               
+                               code    <- gsub(pattern = " ",replacement = "",unlist(str_split(list[i],"/"))[2])
+                               code    <- gsub(pattern="_",replacement = "",code)
+                               code
+                               the_off <- offset[offset$KODE == code,]$offset
+                               
+                               df <- NA
+                               
+                               for(file in files){
+                                 df <- append(df,readLines(paste0(folder,file)))
+                               }
+                               
+                               df0      <- df[!grepl(pattern = "TX=",df)]
+                               df0      <- df0[!grepl(pattern = "TEST",df0)]
+                               df0      <- df0[!grepl(pattern = "MEM",df0)]
+                               df0      <- df0[-1]
+                               d0 <- data.frame(str_split_fixed(df0,",",12))
+                               
+                               names(d0) <- c("date_time","data_id","voltage","raw_wl","wl",
+                                              "temp1","temp2","raw_data_temp1","raw_data_temp2",
+                                              "pulse_count","time_interval","soil_moisture")
+                               head(d0)
+                               
+                               for(col in 2:ncol(d0)){
+                                 d0[,col] <- as.numeric(d0[,col])
+                               }
+                               
+                               d0$WAKTU          <- as.Date(paste0("20",d0$date_time,format="%Y/%m/%d %H:%M"))
+                               d0$GWL            <- d0$wl - as.numeric(the_off)
+                               d0$RAIN           <- d0$pulse_count / 2 
+                               d0$V              <- d0$soil_moisture/2000
+                               d0$SOILMOISTURE   <- (-0.039+1.8753*(d0$V)-4.0596*(d0$V)^2+6.3711*(d0$V)^3-4.7477*(d0$V)^4+1.3911*(d0$V)^5)*100
+
+                               data <- d0
                                data <- data[which(data$GWL > -2), ]
                                
                              })
@@ -182,7 +247,7 @@ shinyServer(function(input, output, session) {
   ############### DAILY PRECIPITATIONS
   daily_sum_precip <- eventReactive(input$StartButton,
                                    {
-                                     req(input$input_file)
+                                     req(input$input_folder)
                                      req(input$StartButton)
                                      req(prims_data())
                                      
@@ -199,7 +264,7 @@ shinyServer(function(input, output, session) {
   ############### DAILY GWL                                 
   daily_avg_gwl <- eventReactive(input$StartButton,
                                  {
-                                   req(input$input_file)
+                                   req(input$input_folder)
                                    req(input$StartButton)
                                    req(prims_data())
                                    
@@ -217,7 +282,7 @@ shinyServer(function(input, output, session) {
   
   daily_avg_sm <- eventReactive(input$StartButton,
                                 {
-                                  req(input$input_file)
+                                  req(input$input_folder)
                                   req(input$StartButton)
                                   req(prims_data())
                                   
@@ -234,7 +299,7 @@ shinyServer(function(input, output, session) {
   ############### WEEKLY PRECIPITATIONS
   weekly_sum_precip <- eventReactive(input$StartButton,
                                     {
-                                      req(input$input_file)
+                                      req(input$input_folder)
                                       req(input$StartButton)
                                       req(prims_data())
                                       
@@ -251,7 +316,7 @@ shinyServer(function(input, output, session) {
   ############### DAILY GWL                                 
   weekly_avg_gwl <- eventReactive(input$StartButton,
                                  {
-                                   req(input$input_file)
+                                   req(input$input_folder)
                                    req(input$StartButton)
                                    req(prims_data())
                                    
@@ -269,7 +334,7 @@ shinyServer(function(input, output, session) {
   
   weekly_avg_sm <- eventReactive(input$StartButton,
                                 {
-                                  req(input$input_file)
+                                  req(input$input_folder)
                                   req(input$StartButton)
                                   req(prims_data())
                                   
@@ -286,7 +351,7 @@ shinyServer(function(input, output, session) {
   ############### MONTHLY PRECIPITATIONS
   monthly_sum_precip <- eventReactive(input$StartButton,
                                     {
-                                      req(input$input_file)
+                                      req(input$input_folder)
                                       req(input$StartButton)
                                       req(prims_data())
                                       
@@ -303,7 +368,7 @@ shinyServer(function(input, output, session) {
   ############### MONTHLY GWL                                 
   monthly_avg_gwl <- eventReactive(input$StartButton,
                                  {
-                                   req(input$input_file)
+                                   req(input$input_folder)
                                    req(input$StartButton)
                                    req(prims_data())
                                    
@@ -321,7 +386,7 @@ shinyServer(function(input, output, session) {
   
   monthly_avg_sm <- eventReactive(input$StartButton,
                                 {
-                                  req(input$input_file)
+                                  req(input$input_folder)
                                   req(input$StartButton)
                                   req(prims_data())
                                   
@@ -336,13 +401,15 @@ shinyServer(function(input, output, session) {
   
   ############### Display the results as map
   output$display_res <- renderPlot({
-    req(input$input_file)
+    req(input$input_folder)
     req(input$StartButton)
     req(prims_data())
     
     print('Check: Display the map')
     
     data <- prims_data()
+    
+    start_year <- as.numeric(year(min(data$WAKTU)))
     
     daily_avg_gwl    <- daily_avg_gwl()
     daily_avg_sm     <- daily_avg_sm()
@@ -358,35 +425,40 @@ shinyServer(function(input, output, session) {
     
     if(input$option_frequency == "10 minutes"){
       
-      gwlts  <- ts(data$GWL, frequency=52650,start=c(2017,10))
-      smts   <- ts(data$SOILMOISTURE, frequency=52650, start=c(2017,10))
-      raints <- ts(data$RAIN, frequency=52650, start=c(2017,10))
+      gwlts  <- ts(data$GWL, frequency=52650,start=c(start_year,10))
+      smts   <- ts(data$SOILMOISTURE, frequency=52650, start=c(start_year,10))
+      raints <- ts(data$RAIN, frequency=52650, start=c(start_year,10))
       }
     if(input$option_frequency == "Daily"){
       
-      gwlts  <- ts(daily_avg_gwl$avg_gwl, frequency=365, start=c(2017,1))
-      smts   <- ts(daily_avg_sm$avg_sm, frequency=365, start=c(2017,1))
-      raints <- ts(daily_sum_precip$total_precip, frequency=365, start=c(2017,1))
+      gwlts  <- ts(daily_avg_gwl$avg_gwl, frequency=365, start=c(start_year,1))
+      smts   <- ts(daily_avg_sm$avg_sm, frequency=365, start=c(start_year,1))
+      raints <- ts(daily_sum_precip$total_precip, frequency=365, start=c(start_year,1))
     }
     if(input$option_frequency == "Weekly"){
       
-      gwlts  <- ts(weekly_avg_gwl$avg_gwl, frequency=52, start=c(2017,1))
-      smts   <- ts(weekly_avg_sm$avg_sm, frequency=52, start=c(2017,1))
-      raints <- ts(weekly_sum_precip$total_precip, frequency=52, start=c(2017,1))
+      gwlts  <- ts(weekly_avg_gwl$avg_gwl, frequency=52, start=c(start_year,1))
+      smts   <- ts(weekly_avg_sm$avg_sm, frequency=52, start=c(start_year,1))
+      raints <- ts(weekly_sum_precip$total_precip, frequency=52, start=c(start_year,1))
     }
     if(input$option_frequency == "Monthly"){
       
-      gwlts  <- ts(monthly_avg_gwl$avg_gwl, frequency=12, start=c(2017,1))
-      smts   <- ts(monthly_avg_sm$avg_sm, frequency=12, start=c(2017,1))
-      raints <- ts(monthly_sum_precip$total_precip, frequency=12, start=c(2017,1))
+      gwlts  <- ts(monthly_avg_gwl$avg_gwl, frequency=12, start=c(start_year,1))
+      smts   <- ts(monthly_avg_sm$avg_sm, frequency=12, start=c(start_year,1))
+      raints <- ts(monthly_sum_precip$total_precip, frequency=12, start=c(start_year,1))
       }
 
     graph_type <- input$option_graph_type
     
     if(graph_type == "Color overlap"){
       
-      ts.plot((raints*max(smts)/max(raints)), (gwlts*max(smts)/max(gwlts)/20), smts, gpars = list(col = c("grey", "red", "blue"), ylim=c(-max(smts),max(smts))))
-      }
+      ts.plot((raints*max(smts)/max(raints)), 
+              (gwlts*max(smts)/max(gwlts)/20), 
+              smts, 
+              gpars = list(col  = c("grey", "red", "blue"),
+                           ylim = c(-max(smts),max(smts))))
+    }
+    
     if(graph_type == "BW separated"){
       plot(cbind(raints, gwlts), yax.flip = TRUE)
       }
@@ -400,7 +472,7 @@ shinyServer(function(input, output, session) {
   ##################################################################################################################################
   ############### Display parameters
   output$parameterSummary <- renderText({
-    req(input$input_file)
+    req(input$input_folder)
     #print(paste0("Parameters are : ",parameters()))
   })
   

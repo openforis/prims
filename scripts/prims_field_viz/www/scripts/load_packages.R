@@ -28,7 +28,7 @@ packages(lubridate)
 # packages(xtable)
 # packages(DT)
 # packages(dismo)
-# packages(stringr)
+packages(stringr)
 packages(dplyr)
 
 ## Packages for graphics and interactive maps

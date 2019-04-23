@@ -109,11 +109,16 @@ shinyUI(
                   box(title= textOutput('title_ts_dir'),width=6, status = "success", solidHeader= TRUE,
                       #htmlOutput('body_ts_dir'),
                       #br(),
-                      shinyFilesButton(id = 'input_file',
-                                       label = textOutput('select_file_button'),  
-                                       title = "Browse",
-                                       multiple=F),
-                      textOutput('filepath')
+                      # shinyFilesButton(id = 'input_file',
+                      #                  label = textOutput('select_file_button'),  
+                      #                  title = "Browse",
+                      #                  multiple=F),
+                      # textOutput('filepath')
+                      
+                      shinyDirButton(id = 'input_folder',
+                                       label = "Input folder",  
+                                       title = "Browse"),
+                      textOutput('outdirpath')
                   ),
                   
                   ####################################################################################
