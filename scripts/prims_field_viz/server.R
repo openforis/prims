@@ -204,9 +204,10 @@ shinyServer(function(input, output, session) {
                                offset$offset <- gsub(",",".",offset$offset)
                                
                                folder  <- paste0(folder(),"/")
+                               print(folder)
                                files   <- list.files(folder)
                                
-                               code    <- gsub(pattern = " ",replacement = "",unlist(str_split(list[i],"/"))[2])
+                               code    <- gsub(pattern = " ",replacement = "",basename(folder))
                                code    <- gsub(pattern="_",replacement = "",code)
                                code
                                the_off <- offset[offset$KODE == code,]$offset
