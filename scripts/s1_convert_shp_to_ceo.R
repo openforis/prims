@@ -32,22 +32,23 @@ out <- cbind(pts_geo@coords[,1:2],
 ############## GIVE SPECIFIC NAMES (CEO-COMPATIBLE)
 names(out) <- c("LONGITUDE","LATITUDE","PLOTID",names(pts))
 
-e<-extent(pts_geo)
-
-poly <- Polygons(list(Polygon(cbind(
-  c(e@xmin,e@xmin,e@xmax,e@xmax,e@xmin),
-  c(e@ymin,e@ymax,e@ymax,e@ymin,e@ymin))
-)),"file")
-
-lp <- append(lp,list(poly))
-}
-
-## Transform the list into a SPDF
-stnl_idx <-SpatialPolygonsDataFrame(
-  SpatialPolygons(lp,1:length(lp)), 
-  data.frame(list_s2), 
-  match.ID = F
-)
+# e    <- extent(pts_geo)
+# lp <- list()
+# 
+# poly <- Polygons(list(Polygon(cbind(
+#   c(e@xmin,e@xmin,e@xmax,e@xmax,e@xmin),
+#   c(e@ymin,e@ymax,e@ymax,e@ymin,e@ymin))
+# )),"file")
+# 
+# lp <- append(lp,list(poly))
+# 
+# 
+# ## Transform the list into a SPDF
+# stnl_idx <-SpatialPolygonsDataFrame(
+#   SpatialPolygons(lp,1:length(lp)), 
+#   data.frame("test"), 
+#   match.ID = F
+# )
 
 
 ############## EXPORT AS CSV FILE
